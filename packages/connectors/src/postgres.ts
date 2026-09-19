@@ -24,7 +24,8 @@ export class PostgresConnector implements Connector {
   }
 
   private async init() {
-    const pg = await import("pg");
+    // pg is an optional peer with no bundled types; loaded dynamically.
+    const pg: any = await import("pg" as string);
     this.pool = new pg.default.Pool({ connectionString: this.opts.connectionString, max: 4 });
   }
 

@@ -82,8 +82,8 @@ function aggregate(agg: Aggregation, rows: Row[], y?: string): number {
   }
 }
 
-function num(v: Cell): number {
-  return typeof v === "number" ? v : Number(v);
+function num(v: unknown): number {
+  return typeof v === "number" ? v : Number(v as never);
 }
 
 function cmp(a: Cell, b: Cell): number {

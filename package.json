@@ -3,12 +3,15 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "demo": "tsx scripts/demo.ts",
     "eval": "tsx scripts/eval.ts",
-    "query": "tsx scripts/query-demo.ts"
+    "query": "tsx scripts/query-demo.ts",
+    "dev": "npm run dev -w @gendash/web",
+    "build": "npm run build -w @gendash/web"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
