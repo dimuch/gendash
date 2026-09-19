@@ -76,4 +76,10 @@ export const mockAnswers: Record<string, unknown> = {
   },
 };
 
-export const EXAMPLE_QUESTIONS = Object.keys(mockAnswers);
+// Example chips for the prices data source (U vs RBLX). Need a real model / API key.
+export const EXAMPLE_QUESTIONS = [
+  "Compare Unity and Roblox closing prices over time",
+  "Average closing price by month for each symbol",
+  "How has Unity's closing price moved over time?",
+  "Highest closing price per quarter",
+];

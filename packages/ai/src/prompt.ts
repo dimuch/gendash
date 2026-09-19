@@ -38,7 +38,8 @@ query shape:
   "x": string,                           // dimension column (must exist)
   "y": string,                           // measure column, required when agg != "none"
   "agg": "count"|"sum"|"avg"|"min"|"max"|"none",
-  "groupBy": string,                     // optional
+  "groupBy": string,                     // optional: draw one series per value of this column
+  "bucket": "day"|"month"|"quarter"|"year",  // optional: bucket a DATE x into periods
   "filters": [ { "column": string, "op": "eq"|"neq"|"gt"|"lt"|"gte"|"lte"|"in", "value": ... } ],
   "limit": number                        // optional, default 1000
 }
@@ -46,7 +47,16 @@ query shape:
 Rules:
 - Use ONLY table and column names from the schema below. Never invent names.
 - sum/avg/min/max require a numeric y column.
-- Build a real dashboard: 2-4 widgets that answer the question from different angles, plus useful sharedFilters. Do not return a single chart unless the question truly asks for one number.`;
+- COMPARE two or more categories over time (e.g. two stock symbols, two regions):
+  put the date/time on x, the measure on y with an aggregation, and set groupBy to
+  the category column. The renderer draws one line per category. Use a "line" widget.
+- ONE specific value of a categorical column (e.g. a single symbol): add an eq filter
+  for it, don't groupBy.
+- GROUP a date by period: set bucket to "month"/"quarter"/"year" together with an
+  aggregation on y (e.g. avg close per month). Bucket only applies to a date column.
+- Build a real dashboard: 2-4 widgets that answer the question from different angles,
+  plus useful sharedFilters. Do not return a single chart unless the question truly
+  asks for one number.`;
 
 export function buildPrompt(
   question: string,

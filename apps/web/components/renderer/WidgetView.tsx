@@ -2,7 +2,7 @@
 import type { Widget } from "@gendash/spec";
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar,
-  XAxis, YAxis, Tooltip, CartesianGrid,
+  XAxis, YAxis, Tooltip, CartesianGrid, Legend,
 } from "recharts";
 
 type Row = Record<string, string | number | boolean | null>;
@@ -10,6 +10,22 @@ type Row = Record<string, string | number | boolean | null>;
 const ACCENT = "#7cc0ff";
 const GRID = "rgba(255,255,255,0.08)";
 const AXIS = "#8899ad";
+const COLORS = ["#7cc0ff", "#a98bff", "#ff9bd6", "#7cf0c0", "#ffd27c", "#ff8f6b"];
+
+/** Pivot grouped rows [{x, series, value}] -> [{x, seriesA, seriesB}] for multi-line charts. */
+function pivot(rows: Row[], xKey: string, gKey: string, vKey: string) {
+  const byX = new Map<string, Row>();
+  const series = new Set<string>();
+  for (const r of rows) {
+    const xv = String(r[xKey]);
+    const s = String(r[gKey]);
+    series.add(s);
+    const row = byX.get(xv) ?? { [xKey]: r[xKey] };
+    row[s] = r[vKey];
+    byX.set(xv, row);
+  }
+  return { data: [...byX.values()], series: [...series] };
+}
 
 const fmt = (n: unknown) =>
   typeof n === "number" ? n.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(n);
@@ -31,6 +47,9 @@ export function WidgetView({
   onSelect?: (column: string, value: string | number) => void;
 }) {
   const xKey = widget.query.x;
+  // grouped/scalar rows carry "value"; raw (agg:none) rows carry the y column.
+  const yKey =
+    rows && rows.length && "value" in rows[0] ? "value" : widget.query.y ?? "value";
 
   const body = () => {
     if (loading) return <div className="muted center">…</div>;
@@ -40,37 +59,65 @@ export function WidgetView({
       case "kpi":
         return <div className="kpi">{fmt(rows[0]?.value)}</div>;
 
-      case "line":
+      case "line": {
+        const gKey = widget.query.groupBy;
+        const p = gKey ? pivot(rows, xKey, gKey, yKey) : null;
+        const data = p ? p.data : rows;
         return (
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={rows} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+            <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
               <CartesianGrid stroke={GRID} vertical={false} />
-              <XAxis dataKey={xKey} stroke={AXIS} fontSize={12} tickLine={false} />
-              <YAxis stroke={AXIS} fontSize={12} tickLine={false} width={44} />
+              <XAxis dataKey={xKey} stroke={AXIS} fontSize={12} tickLine={false} minTickGap={28} />
+              <YAxis stroke={AXIS} fontSize={12} tickLine={false} width={44} domain={["auto", "auto"]} />
               <Tooltip contentStyle={tooltip} />
-              <Line type="monotone" dataKey="value" stroke={ACCENT} strokeWidth={2} dot={{ r: 3 }} />
+              {p ? (
+                <>
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  {p.series.map((s, i) => (
+                    <Line key={s} type="monotone" dataKey={s} stroke={COLORS[i % COLORS.length]}
+                          strokeWidth={2} dot={data.length > 40 ? false : { r: 3 }} />
+                  ))}
+                </>
+              ) : (
+                <Line type="monotone" dataKey={yKey} stroke={ACCENT} strokeWidth={2}
+                      dot={data.length > 40 ? false : { r: 3 }} />
+              )}
             </LineChart>
           </ResponsiveContainer>
         );
+      }
 
-      case "bar":
+      case "bar": {
+        const gKey = widget.query.groupBy;
+        const p = gKey ? pivot(rows, xKey, gKey, yKey) : null;
+        const data = p ? p.data : rows;
         return (
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={rows} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+            <BarChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
               <CartesianGrid stroke={GRID} vertical={false} />
-              <XAxis dataKey={xKey} stroke={AXIS} fontSize={12} tickLine={false} />
-              <YAxis stroke={AXIS} fontSize={12} tickLine={false} width={44} />
+              <XAxis dataKey={xKey} stroke={AXIS} fontSize={12} tickLine={false} minTickGap={28} />
+              <YAxis stroke={AXIS} fontSize={12} tickLine={false} width={44} domain={["auto", "auto"]} />
               <Tooltip contentStyle={tooltip} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar
-                dataKey="value"
-                fill={ACCENT}
-                radius={[4, 4, 0, 0]}
-                cursor="pointer"
-                onClick={(d: any) => onSelect?.(xKey, d?.payload?.[xKey])}
-              />
+              {p ? (
+                <>
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  {p.series.map((s, i) => (
+                    <Bar key={s} dataKey={s} fill={COLORS[i % COLORS.length]} radius={[4, 4, 0, 0]} />
+                  ))}
+                </>
+              ) : (
+                <Bar
+                  dataKey={yKey}
+                  fill={ACCENT}
+                  radius={[4, 4, 0, 0]}
+                  cursor="pointer"
+                  onClick={(d: any) => onSelect?.(xKey, d?.payload?.[xKey])}
+                />
+              )}
             </BarChart>
           </ResponsiveContainer>
         );
+      }
 
       case "table":
         return (
@@ -94,7 +141,9 @@ export function WidgetView({
     <div className={`widget ${widget.type === "kpi" ? "widget-kpi" : ""}`}>
       <div className="widget-title">{widget.title}</div>
       {body()}
-      {widget.type === "bar" && onSelect && <div className="hint">tip: click a bar to filter</div>}
+      {widget.type === "bar" && onSelect && !widget.query.groupBy && (
+        <div className="hint">tip: click a bar to filter</div>
+      )}
     </div>
   );
 }

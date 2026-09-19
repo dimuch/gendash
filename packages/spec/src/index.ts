@@ -27,6 +27,9 @@ export const Filter = z.object({
 });
 export type Filter = z.infer<typeof Filter>;
 
+export const Bucket = z.enum(["day", "month", "quarter", "year"]);
+export type Bucket = z.infer<typeof Bucket>;
+
 export const Query = z.object({
   table: z.string(),
   /** dimension / category column (x axis, group key, table column) */
@@ -35,6 +38,8 @@ export const Query = z.object({
   y: z.string().optional(),
   agg: Aggregation.default("none"),
   groupBy: z.string().optional(),
+  /** bucket a date x into periods (month/quarter/year); implies aggregation */
+  bucket: Bucket.optional(),
   filters: z.array(Filter).default([]),
   limit: z.number().int().positive().max(10000).default(1000),
 });

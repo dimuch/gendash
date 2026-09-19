@@ -1,4 +1,4 @@
-import type { Query, Filter } from "@gendash/spec";
+import type { Query, Filter, Bucket } from "@gendash/spec";
 import type { RunMode } from "./types.js";
 
 /**
@@ -16,6 +16,17 @@ const IDENT = /^[A-Za-z_][A-Za-z0-9_]*$/;
 function ident(name: string): string {
   if (!IDENT.test(name)) throw new Error(`unsafe identifier: ${JSON.stringify(name)}`);
   return `"${name}"`;
+}
+
+/** Bucket a date/timestamp column into a period label. */
+function bucketSql(col: string, b: Bucket): string {
+  const c = `${ident(col)}::timestamp`;
+  switch (b) {
+    case "year": return `to_char(date_trunc('year', ${c}), 'YYYY')`;
+    case "quarter": return `to_char(${c}, 'YYYY') || '-Q' || to_char(${c}, 'Q')`;
+    case "month": return `to_char(date_trunc('month', ${c}), 'YYYY-MM')`;
+    default: return ident(col);
+  }
 }
 
 const OP_SQL: Record<Filter["op"], string> = {
@@ -74,13 +85,18 @@ export function compileSql(query: Query, mode: RunMode): CompiledSql {
   }
 
   // grouped
-  const groupCols = [ident(query.x)];
-  if (query.groupBy) groupCols.push(ident(query.groupBy));
-  const selectCols = groupCols.concat(`${aggExpr()} AS value`);
+  const xExpr = query.bucket ? bucketSql(query.x, query.bucket) : ident(query.x);
+  const dims = [`${xExpr} AS ${ident(query.x)}`];
+  const groupByExprs = [xExpr];
+  if (query.groupBy) {
+    dims.push(ident(query.groupBy));
+    groupByExprs.push(ident(query.groupBy));
+  }
+  const selectCols = [...dims, `${aggExpr()} AS value`];
   return {
     text:
       `SELECT ${selectCols.join(", ")} FROM ${table}${whereClause}` +
-      ` GROUP BY ${groupCols.join(", ")} ORDER BY ${ident(query.x)} LIMIT ${query.limit}`,
+      ` GROUP BY ${groupByExprs.join(", ")} ORDER BY 1 LIMIT ${query.limit}`,
     params,
   };
 }

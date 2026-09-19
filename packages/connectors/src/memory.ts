@@ -1,4 +1,4 @@
-import type { Query, Filter, Aggregation } from "@gendash/spec";
+import type { Query, Filter, Aggregation, Bucket } from "@gendash/spec";
 import type { DataSourceSchema } from "@gendash/ai";
 import type { Connector, Row, Cell, RunOptions } from "./types.js";
 
@@ -37,15 +37,17 @@ export class MemoryConnector implements Connector {
     }
 
     // grouped
+    const xVal = (r: Row): Cell =>
+      query.bucket ? bucketValue(r[query.x], query.bucket) : r[query.x];
+
     const groups = new Map<string, Row[]>();
-    const keyCols = query.groupBy ? [query.x, query.groupBy] : [query.x];
     for (const r of rows) {
-      const key = keyCols.map((c) => String(r[c])).join("\u0000");
+      const key = [String(xVal(r)), query.groupBy ? String(r[query.groupBy]) : ""].join("\u0000");
       (groups.get(key) ?? groups.set(key, []).get(key)!).push(r);
     }
     const result: Row[] = [];
     for (const [, grp] of groups) {
-      const out: Row = { [query.x]: grp[0][query.x] };
+      const out: Row = { [query.x]: xVal(grp[0]) };
       if (query.groupBy) out[query.groupBy] = grp[0][query.groupBy];
       out.value = aggregate(query.agg, grp, query.y);
       result.push(out);
@@ -79,6 +81,18 @@ function aggregate(agg: Aggregation, rows: Row[], y?: string): number {
     case "min": return Math.min(...nums);
     case "max": return Math.max(...nums);
     default: return nums.length;
+  }
+}
+
+function bucketValue(v: Cell, b: Bucket): string {
+  const s = String(v);
+  const year = s.slice(0, 4);
+  const month = Number(s.slice(5, 7));
+  switch (b) {
+    case "year": return year;
+    case "quarter": return `${year}-Q${Math.floor((month - 1) / 3) + 1}`;
+    case "month": return s.slice(0, 7);
+    default: return s;
   }
 }
 

@@ -38,7 +38,10 @@ function checkQuery(
     return c;
   };
 
-  requireCol(q.x, "x");
+  const xCol = requireCol(q.x, "x");
+  if (q.bucket && q.bucket !== "day" && xCol && xCol.type !== "date") {
+    problems.push(`${where}: bucket "${q.bucket}" needs a date "x", but "${q.x}" is ${xCol.type}.`);
+  }
 
   if (q.agg !== "none") {
     if (!q.y) {
