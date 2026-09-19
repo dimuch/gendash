@@ -25,7 +25,10 @@ export class PostgresConnector implements Connector {
 
   private async init() {
     // pg is an optional peer with no bundled types; loaded dynamically.
-    const pg: any = await import("pg" as string);
+    // webpackIgnore keeps bundlers from resolving it at build time, so the app
+    // compiles fine when pg isn't installed (only needed for a real DB).
+    // @ts-ignore optional dependency — may not be installed
+    const pg: any = await import(/* webpackIgnore: true */ "pg");
     this.pool = new pg.default.Pool({ connectionString: this.opts.connectionString, max: 4 });
   }
 
