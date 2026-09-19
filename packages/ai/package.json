@@ -1,0 +1,18 @@
+{
+  "name": "@gendash/ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@gendash/spec": "0.1.0",
+    "zod": "^3.23.8"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  }
+}

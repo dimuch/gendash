@@ -1,0 +1,23 @@
+{
+  "name": "gendash",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "demo": "tsx scripts/demo.ts",
+    "eval": "tsx scripts/eval.ts",
+    "query": "tsx scripts/query-demo.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  }
+}
