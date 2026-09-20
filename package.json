@@ -23,5 +23,8 @@
   },
   "optionalDependencies": {
     "@anthropic-ai/sdk": "^0.32.1"
+  },
+  "overrides": {
+    "postcss": "^8.5.28"
   }
 }
