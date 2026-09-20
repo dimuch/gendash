@@ -1,0 +1,23 @@
+# /etc/systemd/system/gendash.service
+# Runs the GenDash Next.js app as the `uppr` user, listening on 127.0.0.1:3001.
+# nginx (gendash-nginx.conf) terminates TLS and proxies to it. Port 3001 avoids
+# the snake server on 3000.
+[Unit]
+Description=GenDash Next.js app
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/uppr/gendash
+ExecStart=/usr/bin/npm run start
+Environment=NODE_ENV=production
+Environment=PORT=3001
+Restart=always
+RestartSec=3
+User=uppr
+Group=uppr
+# Hardening
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

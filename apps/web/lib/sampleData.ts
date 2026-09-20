@@ -47,32 +47,38 @@ export const sampleRows: Record<string, Row[]> = {
   ],
 };
 
-/** Canned specs so the app runs with no API key (mirrors the repo eval cases). */
+/** Canned specs so the demo chips work with no API key (studies dataset). */
 export const mockAnswers: Record<string, unknown> = {
-  "How is revenue trending over time?": {
-    title: "Revenue over time",
+  "How many studies are there per therapeutic area?": {
+    title: "Studies by therapeutic area",
     widgets: [
-      { type: "kpi", title: "Total revenue", query: { table: "orders", x: "id", y: "total", agg: "sum", filters: [], limit: 1000 } },
-      { type: "line", title: "Revenue by day", query: { table: "orders", x: "created_at", y: "total", agg: "sum", filters: [], limit: 1000 } },
-      { type: "bar", title: "Revenue by country", query: { table: "orders", x: "country", y: "total", agg: "sum", filters: [], limit: 1000 } },
+      { type: "kpi", title: "Total studies", query: { table: "studies", x: "id", y: "id", agg: "count", filters: [], limit: 1000 } },
+      { type: "bar", title: "Studies per therapeutic area", query: { table: "studies", x: "therapeutic_area", y: "id", agg: "count", filters: [], limit: 1000 } },
     ],
-    sharedFilters: ["country", "status"],
+    sharedFilters: ["phase", "status"],
   },
-  "Which countries drive the most revenue?": {
-    title: "Revenue by country",
+  "Studies started per year by phase": {
+    title: "Studies started per year by phase",
     widgets: [
-      { type: "bar", title: "Revenue by country", query: { table: "orders", x: "country", y: "total", agg: "sum", filters: [], limit: 1000 } },
-      { type: "table", title: "Orders by country", query: { table: "orders", x: "country", y: "id", agg: "count", filters: [], limit: 1000 } },
+      { type: "line", title: "Studies per year by phase", query: { table: "studies", x: "start_date", y: "id", agg: "count", bucket: "year", groupBy: "phase", filters: [], limit: 1000 } },
     ],
-    sharedFilters: ["status"],
+    sharedFilters: ["therapeutic_area", "status"],
   },
-  "How many orders do we have and how are they split by status?": {
-    title: "Order volume and status",
+  "Average enrollment by phase": {
+    title: "Average enrollment by phase",
     widgets: [
-      { type: "kpi", title: "Total orders", query: { table: "orders", x: "id", y: "id", agg: "count", filters: [], limit: 1000 } },
-      { type: "bar", title: "Orders by status", query: { table: "orders", x: "status", y: "id", agg: "count", filters: [], limit: 1000 } },
+      { type: "kpi", title: "Avg enrollment (all)", query: { table: "studies", x: "id", y: "enrollment", agg: "avg", filters: [], limit: 1000 } },
+      { type: "bar", title: "Average enrollment by phase", query: { table: "studies", x: "phase", y: "enrollment", agg: "avg", filters: [], limit: 1000 } },
     ],
-    sharedFilters: ["country"],
+    sharedFilters: ["therapeutic_area", "status"],
+  },
+  "Which sponsors run the most studies, and their status breakdown?": {
+    title: "Studies by sponsor",
+    widgets: [
+      { type: "bar", title: "Studies per sponsor", query: { table: "studies", x: "sponsor", y: "id", agg: "count", filters: [], limit: 1000 } },
+      { type: "bar", title: "Status breakdown by sponsor", query: { table: "studies", x: "sponsor", y: "id", agg: "count", groupBy: "status", filters: [], limit: 1000 } },
+    ],
+    sharedFilters: ["therapeutic_area", "phase"],
   },
 };
 

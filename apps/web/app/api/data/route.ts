@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     }
     const mode: RunMode = MODES.includes(body.mode) ? body.mode : "grouped";
 
-    const connector = getConnector();
+    const connector = getConnector(body.sourceId);
     const schema = await connector.schema();
     // one-widget spec so we can reuse the semantic checker
     const semantic = checkAgainstSchema(

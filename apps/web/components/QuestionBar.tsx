@@ -5,9 +5,11 @@ import { EXAMPLE_QUESTIONS } from "../lib/sampleData";
 export function QuestionBar({
   onAsk,
   loading,
+  showExamples = true,
 }: {
   onAsk: (question: string) => void;
   loading: boolean;
+  showExamples?: boolean;
 }) {
   const [q, setQ] = useState("");
 
@@ -29,7 +31,7 @@ export function QuestionBar({
           {loading ? "Building…" : "Ask"}
         </button>
       </form>
-      <div className="examples">
+      <div className="examples" style={{ display: showExamples ? undefined : "none" }}>
         {EXAMPLE_QUESTIONS.map((ex) => (
           <button key={ex} className="chip" onClick={() => { setQ(ex); onAsk(ex); }} disabled={loading}>
             {ex}

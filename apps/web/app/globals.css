@@ -22,6 +22,10 @@ body {
 .brand { font-size: 1.4rem; font-weight: 700; }
 .tagline { color: var(--muted); font-size: .95rem; }
 
+/* upload bar */
+.upload { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.src-info { font-size: .82rem; color: var(--muted); }
+
 /* ask bar (app chrome; the dashboard itself is styled by @gendash/react) */
 .ask { margin-bottom: 22px; }
 .ask-form { display: flex; gap: 8px; }

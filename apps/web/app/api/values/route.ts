@@ -8,8 +8,9 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const table = searchParams.get("table") ?? "";
   const column = searchParams.get("column") ?? "";
+  const sourceId = searchParams.get("sourceId") ?? undefined;
   try {
-    const connector = getConnector();
+    const connector = getConnector(sourceId);
     const schema = await connector.schema();
     const t = schema.find((x) => x.name === table);
     if (!t || !t.columns.some((c) => c.name === column)) {

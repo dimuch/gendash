@@ -11,11 +11,17 @@ import { MemoryConnector } from "./memory.js";
  */
 export function connectorFromCsv(path: string, tableName?: string): MemoryConnector {
   const text = readFileSync(path, "utf8");
-  const table = tableName ?? basename(path, extname(path)).replace(/[^A-Za-z0-9_]/g, "_");
-  const records = parseCsv(text);
-  if (records.length === 0) throw new Error(`empty CSV: ${path}`);
+  const table = tableName ?? basename(path, extname(path));
+  return connectorFromCsvText(text, table);
+}
 
-  const header = records[0];
+/** Build a connector from raw CSV text (the upload path). */
+export function connectorFromCsvText(text: string, tableName: string): MemoryConnector {
+  const table = (tableName || "data").replace(/[^A-Za-z0-9_]/g, "_").replace(/^([0-9])/, "_$1");
+  const records = parseCsv(text);
+  if (records.length < 2) throw new Error("CSV needs a header row and at least one data row");
+
+  const header = records[0].map((h, i) => (h.trim() || `col_${i}`).replace(/[^A-Za-z0-9_]/g, "_"));
   const dataRows = records.slice(1);
   const types: ColumnType[] = header.map((_, c) => inferType(dataRows.map((r) => r[c])));
 

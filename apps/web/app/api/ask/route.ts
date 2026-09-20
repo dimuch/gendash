@@ -8,11 +8,11 @@ export const runtime = "nodejs";
 /** POST { question } -> { spec } */
 export async function POST(req: Request) {
   try {
-    const { question } = await req.json();
+    const { question, sourceId } = await req.json();
     if (typeof question !== "string" || !question.trim()) {
       return NextResponse.json({ error: "question is required" }, { status: 400 });
     }
-    const schema = await getConnector().schema();
+    const schema = await getConnector(sourceId).schema();
     const { spec, attempts } = await planDashboard(question, schema, getLLM());
     return NextResponse.json({ spec, attempts });
   } catch (e) {

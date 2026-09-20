@@ -11,7 +11,8 @@
     "eval": "tsx scripts/eval.ts",
     "query": "tsx scripts/query-demo.ts",
     "dev": "npm run dev -w @gendash/web",
-    "build": "npm run build -w @gendash/web"
+    "build": "npm run build -w @gendash/web",
+    "start": "npm run start -w @gendash/web"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
