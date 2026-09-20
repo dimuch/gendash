@@ -20,7 +20,9 @@ fi
 cd "$REPO"
 
 echo "==> [2/5] install + build (this can take a minute)"
-npm ci --include=dev
+# Prefer a reproducible install; fall back to a reconciling install if the
+# lockfile drifts (e.g. an optional dep out of sync).
+npm ci --include=dev || npm install --include=dev
 npm run build
 
 echo "==> [3/5] systemd unit"
