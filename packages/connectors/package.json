@@ -11,8 +11,5 @@
   "dependencies": {
     "@gendash/spec": "0.1.0",
     "@gendash/ai": "0.1.0"
-  },
-  "optionalDependencies": {
-    "pg": "^8.13.1"
   }
 }
