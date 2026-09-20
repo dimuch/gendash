@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { basename, extname } from "node:path";
 import type { ColumnType, DataSourceSchema } from "@gendash/ai";
-import type { Row, Cell } from "./types.js";
-import { MemoryConnector } from "./memory.js";
+import type { Row, Cell } from "./types";
+import { MemoryConnector } from "./memory";
 
 /**
  * Minimal CSV loader — enough for the upload path in v0.1. Handles quoted

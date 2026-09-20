@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { DashboardSpec } from "@gendash/spec";
-import { WidgetView } from "./WidgetView.js";
-import { modeForWidget, type FetchData, type FetchValues, type Row } from "./types.js";
+import { WidgetView } from "./WidgetView";
+import { modeForWidget, type FetchData, type FetchValues, type Row } from "./types";
 
 /**
  * The reusable dashboard renderer.

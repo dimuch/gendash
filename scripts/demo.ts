@@ -8,8 +8,8 @@
  * dataset. This is the make-or-break loop: question -> AI -> validated spec.
  */
 import { planDashboard, MockLLM, makeLLM, type LLMClient } from "@gendash/ai";
-import { sampleSchema } from "../fixtures/schema.js";
-import { mockAnswers } from "../fixtures/cases.js";
+import { sampleSchema } from "../fixtures/schema";
+import { mockAnswers } from "../fixtures/cases";
 
 const question =
   process.argv.slice(2).join(" ").trim() || "How is revenue trending over time?";

@@ -9,8 +9,8 @@
  */
 import { planDashboard, MockLLM, makeLLM, type LLMClient } from "@gendash/ai";
 import type { DashboardSpec, Widget } from "@gendash/spec";
-import { sampleSchema } from "../fixtures/schema.js";
-import { cases, mockAnswers } from "../fixtures/cases.js";
+import { sampleSchema } from "../fixtures/schema";
+import { cases, mockAnswers } from "../fixtures/cases";
 
 function widgetKey(w: Widget): string {
   const q = w.query;

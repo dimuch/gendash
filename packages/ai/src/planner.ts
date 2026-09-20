@@ -1,9 +1,9 @@
 import { DashboardSpec } from "@gendash/spec";
 import type { DashboardSpec as Spec } from "@gendash/spec";
-import { DataSourceSchema } from "./dataschema.js";
-import { buildPrompt, errorTurn, ChatMessage } from "./prompt.js";
-import { checkAgainstSchema } from "./checkSchema.js";
-import type { LLMClient } from "./llm.js";
+import { DataSourceSchema } from "./dataschema";
+import { buildPrompt, errorTurn, ChatMessage } from "./prompt";
+import { checkAgainstSchema } from "./checkSchema";
+import type { LLMClient } from "./llm";
 
 export class PlannerFailed extends Error {
   constructor(public attempts: number, public lastProblems: string[]) {

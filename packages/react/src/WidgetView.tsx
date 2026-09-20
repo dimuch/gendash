@@ -1,6 +1,6 @@
 "use client";
 import type { Widget } from "@gendash/spec";
-import type { Row } from "./types.js";
+import type { Row } from "./types";
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend,

@@ -1,4 +1,4 @@
-export { GenDashboard } from "./GenDashboard.js";
-export { WidgetView } from "./WidgetView.js";
-export { modeForWidget } from "./types.js";
-export type { Row, Cell, RunMode, FetchData, FetchValues } from "./types.js";
+export { GenDashboard } from "./GenDashboard";
+export { WidgetView } from "./WidgetView";
+export { modeForWidget } from "./types";
+export type { Row, Cell, RunMode, FetchData, FetchValues } from "./types";

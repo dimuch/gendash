@@ -1,5 +1,5 @@
 import type { DashboardSpec, Query, Aggregation } from "@gendash/spec";
-import { DataSourceSchema, findColumn, findTable, ColumnType } from "./dataschema.js";
+import { DataSourceSchema, findColumn, findTable, ColumnType } from "./dataschema";
 
 /**
  * Semantic validation — the step people skip.

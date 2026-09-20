@@ -1,5 +1,5 @@
 import type { Query, Filter, Bucket } from "@gendash/spec";
-import type { RunMode } from "./types.js";
+import type { RunMode } from "./types";
 
 /**
  * Compile a validated spec Query into parameterised, read-only Postgres SQL.

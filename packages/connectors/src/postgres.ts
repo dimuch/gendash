@@ -1,7 +1,7 @@
 import type { Query } from "@gendash/spec";
 import type { ColumnType, DataSourceSchema } from "@gendash/ai";
-import type { Connector, Row, RunOptions } from "./types.js";
-import { compileSql } from "./compileSql.js";
+import type { Connector, Row, RunOptions } from "./types";
+import { compileSql } from "./compileSql";
 
 /**
  * Read-only Postgres connector. Requires the `pg` package.

@@ -12,8 +12,8 @@
  */
 import { planDashboard, MockLLM, makeLLM, type LLMClient } from "@gendash/ai";
 import { MemoryConnector, compileSql, modeForWidget } from "@gendash/connectors";
-import { sampleSchema, sampleRows } from "../fixtures/schema.js";
-import { mockAnswers } from "../fixtures/cases.js";
+import { sampleSchema, sampleRows } from "../fixtures/schema";
+import { mockAnswers } from "../fixtures/cases";
 
 const question =
   process.argv.slice(2).join(" ").trim() || "How is revenue trending over time?";

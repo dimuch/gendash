@@ -1,4 +1,4 @@
-import type { ChatMessage } from "./prompt.js";
+import type { ChatMessage } from "./prompt";
 
 /** One provider behind one interface — swap Anthropic/OpenAI/mock freely. */
 export interface LLMClient {

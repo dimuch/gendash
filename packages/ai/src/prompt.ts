@@ -1,5 +1,5 @@
 import { WIDGET_TYPES } from "@gendash/spec";
-import { DataSourceSchema } from "./dataschema.js";
+import { DataSourceSchema } from "./dataschema";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";

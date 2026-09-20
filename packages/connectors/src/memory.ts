@@ -1,6 +1,6 @@
 import type { Query, Filter, Aggregation, Bucket } from "@gendash/spec";
 import type { DataSourceSchema } from "@gendash/ai";
-import type { Connector, Row, Cell, RunOptions } from "./types.js";
+import type { Connector, Row, Cell, RunOptions } from "./types";
 
 /**
  * In-memory connector — executes a validated Query directly in JS.
