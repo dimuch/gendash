@@ -76,10 +76,10 @@ export const mockAnswers: Record<string, unknown> = {
   },
 };
 
-// Example chips for the prices data source (U vs RBLX). Need a real model / API key.
+// Example chips for the clinical studies data source. Need a real model / API key.
 export const EXAMPLE_QUESTIONS = [
-  "Compare Unity and Roblox closing prices over time",
-  "Average closing price by month for each symbol",
-  "How has Unity's closing price moved over time?",
-  "Highest closing price per quarter",
+  "How many studies are there per therapeutic area?",
+  "Studies started per year by phase",
+  "Average enrollment by phase",
+  "Which sponsors run the most studies, and their status breakdown?",
 ];

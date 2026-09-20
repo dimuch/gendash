@@ -22,7 +22,7 @@ body {
 .brand { font-size: 1.4rem; font-weight: 700; }
 .tagline { color: var(--muted); font-size: .95rem; }
 
-/* ask bar */
+/* ask bar (app chrome; the dashboard itself is styled by @gendash/react) */
 .ask { margin-bottom: 22px; }
 .ask-form { display: flex; gap: 8px; }
 .ask input {
@@ -41,35 +41,6 @@ body {
   border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer;
 }
 .chip:hover { color: var(--text); border-color: var(--accent); }
-
-/* dashboard */
-.dash-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 6px 0 14px; }
-.dash-head h2 { margin: 0; font-size: 1.15rem; }
-.filters { display: flex; gap: 12px; flex-wrap: wrap; }
-.filter { display: flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
-.filter select {
-  background: var(--panel); color: var(--text); border: 1px solid var(--line);
-  border-radius: 8px; padding: 6px 8px;
-}
-
-.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-
-.widget {
-  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
-  padding: 16px; min-height: 140px;
-}
-.widget-kpi { display: flex; flex-direction: column; justify-content: center; }
-.widget-title { font-size: .85rem; color: var(--muted); margin-bottom: 10px; }
-.kpi { font-size: 2.6rem; font-weight: 700; line-height: 1; }
-.hint { font-size: .72rem; color: var(--muted); margin-top: 8px; }
-.center { display: grid; place-items: center; height: 180px; }
-.muted { color: var(--muted); }
-
-.tableWrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-th { color: var(--muted); font-weight: 600; }
 
 .error {
   background: rgba(255, 120, 120, .08); border: 1px solid rgba(255, 120, 120, .3);
