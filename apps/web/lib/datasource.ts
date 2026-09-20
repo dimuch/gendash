@@ -6,13 +6,20 @@ import { connectorFromCsv, connectorFromCsvText, type Connector } from "@gendash
  * Data sources for the app.
  *  - the demo dataset (clinical studies) is the default.
  *  - uploaded CSVs are registered by id and selected per request via sourceId.
+ *    We keep the raw CSV alongside the connector so a saved dashboard can be
+ *    made self-contained.
  *
- * The registry lives on globalThis so it survives dev hot-reloads. It's
- * in-memory (fine for MVP): uploads are lost on restart and not shared across
- * instances — persistence comes with the save/DB milestone.
+ * In-memory (fine for MVP): uploads are lost on restart and not shared across
+ * instances — durable persistence comes with the DB milestone.
  */
-const g = globalThis as unknown as { __gendashSources?: Map<string, Connector> };
-g.__gendashSources ??= new Map<string, Connector>();
+interface Source {
+  connector: Connector;
+  csv: string;
+  table: string;
+}
+
+const g = globalThis as unknown as { __gendashSources?: Map<string, Source> };
+g.__gendashSources ??= new Map<string, Source>();
 const sources = g.__gendashSources;
 
 let demo: Connector | null = null;
@@ -22,20 +29,25 @@ function demoConnector(): Connector {
 }
 
 export function getConnector(sourceId?: string): Connector {
-  if (sourceId && sources.has(sourceId)) return sources.get(sourceId)!;
+  if (sourceId && sources.has(sourceId)) return sources.get(sourceId)!.connector;
   return demoConnector();
+}
+
+/** Raw CSV + table for a source, so a save can capture it. */
+export function getSource(sourceId?: string): Source | undefined {
+  return sourceId ? sources.get(sourceId) : undefined;
 }
 
 /** Parse an uploaded CSV, register it, and return its id + inferred schema. */
 export async function registerCsv(name: string, csvText: string) {
-  const conn = connectorFromCsvText(csvText, name);
+  const connector = connectorFromCsvText(csvText, name);
+  const schema = await connector.schema();
+  const table = schema[0]?.name ?? "data";
   const id = randomUUID();
-  sources.set(id, conn);
-  // cap memory: drop the oldest once we exceed 50 uploads
+  sources.set(id, { connector, csv: csvText, table });
   if (sources.size > 50) {
     const oldest = sources.keys().next().value;
     if (oldest) sources.delete(oldest);
   }
-  const schema = await conn.schema();
-  return { sourceId: id, schema, table: schema[0]?.name };
+  return { sourceId: id, schema, table };
 }

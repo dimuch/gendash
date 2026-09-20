@@ -16,6 +16,9 @@ export function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [sourceId, setSourceId] = useState<string | undefined>();
   const [info, setInfo] = useState<string | null>(null);
+  const [lastQuestion, setLastQuestion] = useState("");
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const upload = useCallback(async (name: string, csv: string) => {
     setError(null);
@@ -38,6 +41,8 @@ export function Dashboard() {
   const ask = useCallback(async (question: string) => {
     setLoading(true);
     setError(null);
+    setSavedUrl(null);
+    setLastQuestion(question);
     try {
       const res = await fetch("/api/ask", {
         method: "POST",
@@ -73,12 +78,43 @@ export function Dashboard() {
     return res.ok ? json.values : [];
   }, [sourceId]);
 
+  const save = useCallback(async () => {
+    if (!spec) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/dashboards", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question: lastQuestion, spec, sourceId }),
+      });
+      const json = await res.json();
+      if (res.ok) setSavedUrl(new URL(json.url, window.location.origin).toString());
+    } finally {
+      setSaving(false);
+    }
+  }, [spec, lastQuestion, sourceId]);
+
   return (
     <div>
       <UploadBar onUpload={upload} info={info} />
       <QuestionBar onAsk={ask} loading={loading} showExamples={!sourceId} />
       {error && <div className="error">{error}</div>}
-      {spec && <GenDashboard spec={spec} fetchData={fetchData} fetchValues={fetchValues} />}
+      {spec && (
+        <>
+          <div className="save-row">
+            <button className="chip" onClick={save} disabled={saving}>
+              {saving ? "Saving…" : "🔗 Save & share"}
+            </button>
+            {savedUrl && (
+              <span className="src-info">
+                Shareable link:{" "}
+                <a href={savedUrl} target="_blank" rel="noreferrer">{savedUrl}</a>
+              </span>
+            )}
+          </div>
+          <GenDashboard spec={spec} fetchData={fetchData} fetchValues={fetchValues} />
+        </>
+      )}
     </div>
   );
 }

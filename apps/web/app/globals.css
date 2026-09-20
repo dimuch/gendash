@@ -25,6 +25,10 @@ body {
 /* upload bar */
 .upload { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .src-info { font-size: .82rem; color: var(--muted); }
+.src-info a { color: var(--accent); }
+
+/* save/share row */
+.save-row { display: flex; align-items: center; gap: 12px; margin: 4px 0 14px; flex-wrap: wrap; }
 
 /* ask bar (app chrome; the dashboard itself is styled by @gendash/react) */
 .ask { margin-bottom: 22px; }
