@@ -55,6 +55,10 @@ query shape:
 Rules:
 - Use ONLY table and column names from the schema below. Never invent names.
 - sum/avg/min/max require a numeric y column.
+- BOOLEAN columns (type "boolean"): filter with a real JSON boolean, not a string.
+  "landlocked countries by region" -> bar, x=region, agg=count,
+  filters=[{"column":"landlocked","op":"eq","value":true}]. Use true/false, never
+  "true"/"yes"/1.
 - COMPARE two or more categories over time (e.g. two stock symbols, two regions):
   put the date/time on x, the measure on y with an aggregation, and set groupBy to
   the category column. The renderer draws one line per category. Use a "line" widget.
