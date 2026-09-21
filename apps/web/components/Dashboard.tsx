@@ -14,6 +14,7 @@ export function Dashboard() {
   const [spec, setSpec] = useState<DashboardSpec | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [sourceId, setSourceId] = useState<string | undefined>();
   const [info, setInfo] = useState<string | null>(null);
   const [lastQuestion, setLastQuestion] = useState("");
@@ -41,6 +42,7 @@ export function Dashboard() {
   const ask = useCallback(async (question: string) => {
     setLoading(true);
     setError(null);
+    setNotice(null);
     setSavedUrl(null);
     setLastQuestion(question);
     try {
@@ -51,6 +53,11 @@ export function Dashboard() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "planner failed");
+      if (json.cannotAnswer) {
+        setSpec(null);
+        setNotice(json.cannotAnswer);
+        return;
+      }
       setSpec(json.spec as DashboardSpec);
     } catch (e) {
       setSpec(null);
@@ -99,6 +106,7 @@ export function Dashboard() {
       <UploadBar onUpload={upload} info={info} />
       <QuestionBar onAsk={ask} loading={loading} showExamples={!sourceId} />
       {error && <div className="error">{error}</div>}
+      {notice && <div className="notice">{notice}</div>}
       {spec && (
         <>
           <div className="save-row">

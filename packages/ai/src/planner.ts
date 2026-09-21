@@ -13,7 +13,10 @@ export class PlannerFailed extends Error {
 }
 
 export interface PlanResult {
-  spec: Spec;
+  /** the dashboard spec, or null when the question is out of scope */
+  spec: Spec | null;
+  /** set (with spec null) when the question can't be answered from the schema */
+  cannotAnswer?: string;
   attempts: number;
 }
 
@@ -42,6 +45,16 @@ export async function planDashboard(
       lastProblems = [`model did not return valid JSON: ${(e as Error).message}`];
       messages.push(errorTurn(lastProblems));
       continue;
+    }
+
+    // Out-of-scope: the model may decline when the question can't be answered
+    // from this schema (e.g. "weather" against clinical-studies data).
+    if (raw && typeof raw === "object" && (raw as any).cannotAnswer === true) {
+      return {
+        spec: null,
+        cannotAnswer: String((raw as any).reason ?? "This question can't be answered from the connected data."),
+        attempts: attempt,
+      };
     }
 
     const parsed = DashboardSpec.safeParse(raw);

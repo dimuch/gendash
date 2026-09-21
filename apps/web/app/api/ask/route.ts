@@ -13,7 +13,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "question is required" }, { status: 400 });
     }
     const schema = await getConnector(sourceId).schema();
-    const { spec, attempts } = await planDashboard(question, schema, getLLM());
+    const { spec, cannotAnswer, attempts } = await planDashboard(question, schema, getLLM());
+    if (cannotAnswer) {
+      return NextResponse.json({ cannotAnswer, attempts });
+    }
     return NextResponse.json({ spec, attempts });
   } catch (e) {
     const msg = e instanceof PlannerFailed ? e.message : (e as Error).message;

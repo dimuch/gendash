@@ -54,5 +54,9 @@ body {
   background: rgba(255, 120, 120, .08); border: 1px solid rgba(255, 120, 120, .3);
   color: #ffb4b4; padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: .9rem;
 }
+.notice {
+  background: rgba(124, 192, 255, .08); border: 1px solid rgba(124, 192, 255, .3);
+  color: #bcd8f5; padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: .9rem;
+}
 .foot { margin-top: 30px; color: var(--muted); font-size: .8rem; }
 .foot code { background: var(--panel-2); padding: 2px 6px; border-radius: 6px; }

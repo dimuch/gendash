@@ -19,6 +19,13 @@ const SYSTEM = `You turn a plain-language question into a JSON dashboard spec.
 
 You MUST reply with a single JSON object and nothing else — no prose, no markdown fences.
 
+OUT OF SCOPE: if the question cannot be answered from the data schema given below
+— it asks about data, entities, or metrics that are NOT present (e.g. a weather
+forecast when the data is clinical studies, or anything the columns can't
+supply) — do NOT invent or force a dashboard. Instead return exactly:
+  {"cannotAnswer": true, "reason": "<one short sentence: what's missing, and an example of what this data CAN answer>"}
+Only build a dashboard when the schema genuinely supports the question.
+
 The JSON shape:
 {
   "title": string,
