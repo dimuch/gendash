@@ -78,8 +78,13 @@ export function compileSql(query: Query, mode: RunMode): CompiledSql {
   if (mode === "rows") {
     const cols = [ident(query.x)];
     if (query.y) cols.push(ident(query.y));
+    let orderClause = "";
+    if (query.sort) {
+      const col = query.sort.by === "value" ? ident(query.y ?? query.x) : ident(query.x);
+      orderClause = ` ORDER BY ${col} ${query.sort.dir === "desc" ? "DESC" : "ASC"}`;
+    }
     return {
-      text: `SELECT ${cols.join(", ")} FROM ${table}${whereClause} LIMIT ${query.limit}`,
+      text: `SELECT ${cols.join(", ")} FROM ${table}${whereClause}${orderClause} LIMIT ${query.limit}`,
       params,
     };
   }
@@ -93,10 +98,14 @@ export function compileSql(query: Query, mode: RunMode): CompiledSql {
     groupByExprs.push(ident(query.groupBy));
   }
   const selectCols = [...dims, `${aggExpr()} AS value`];
+  const orderBy =
+    query.sort?.by === "value"
+      ? `value ${query.sort.dir === "desc" ? "DESC" : "ASC"}`
+      : `1 ${query.sort?.dir === "desc" ? "DESC" : "ASC"}`;
   return {
     text:
       `SELECT ${selectCols.join(", ")} FROM ${table}${whereClause}` +
-      ` GROUP BY ${groupByExprs.join(", ")} ORDER BY 1 LIMIT ${query.limit}`,
+      ` GROUP BY ${groupByExprs.join(", ")} ORDER BY ${orderBy} LIMIT ${query.limit}`,
     params,
   };
 }

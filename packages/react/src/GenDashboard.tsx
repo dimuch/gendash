@@ -16,10 +16,13 @@ export function GenDashboard({
   spec,
   fetchData,
   fetchValues,
+  refreshKey,
 }: {
   spec: DashboardSpec;
   fetchData: FetchData;
   fetchValues?: FetchValues;
+  /** Bump this to re-run every widget's fetch (live refresh) without resetting filters. */
+  refreshKey?: number;
 }) {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<number, { rows: Row[]; loading: boolean }>>({});
@@ -56,7 +59,7 @@ export function GenDashboard({
       if (live) setData((d) => ({ ...d, [i]: { rows, loading: false } }));
     });
     return () => { live = false; };
-  }, [spec, filters, fetchData]);
+  }, [spec, filters, fetchData, refreshKey]);
 
   const setFilter = (column: string, value: string | number) =>
     setFilters((f) => ({ ...f, [column]: String(value) }));

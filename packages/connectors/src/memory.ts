@@ -29,11 +29,17 @@ export class MemoryConnector implements Connector {
     }
 
     if (opts.mode === "rows") {
-      return rows.slice(0, query.limit).map((r) => {
+      const projected = rows.map((r) => {
         const out: Row = { [query.x]: r[query.x] };
         if (query.y) out[query.y] = r[query.y];
         return out;
       });
+      if (query.sort) {
+        const key = query.sort.by === "value" ? (query.y ?? query.x) : query.x;
+        projected.sort((a, b) => cmp(a[key], b[key]));
+        if (query.sort.dir === "desc") projected.reverse();
+      }
+      return projected.slice(0, query.limit);
     }
 
     // grouped
@@ -52,7 +58,11 @@ export class MemoryConnector implements Connector {
       out.value = aggregate(query.agg, grp, query.y);
       result.push(out);
     }
-    result.sort((a, b) => cmp(a[query.x], b[query.x]));
+    // Default order is by x (stable, chart-friendly). An explicit sort — e.g.
+    // "top 10 by value desc" — overrides it.
+    const sortKey = query.sort?.by === "value" ? "value" : query.x;
+    result.sort((a, b) => cmp(a[sortKey], b[sortKey]));
+    if (query.sort?.dir === "desc") result.reverse();
     return result.slice(0, query.limit);
   }
 }

@@ -48,6 +48,7 @@ query shape:
   "groupBy": string,                     // optional: draw one series per value of this column
   "bucket": "day"|"month"|"quarter"|"year",  // optional: bucket a DATE x into periods
   "filters": [ { "column": string, "op": "eq"|"neq"|"gt"|"lt"|"gte"|"lte"|"in", "value": ... } ],
+  "sort": { "by": "x"|"value", "dir": "asc"|"desc" },  // optional: order before limit
   "limit": number                        // optional, default 1000
 }
 
@@ -61,6 +62,15 @@ Rules:
   for it, don't groupBy.
 - GROUP a date by period: set bucket to "month"/"quarter"/"year" together with an
   aggregation on y (e.g. avg close per month). Bucket only applies to a date column.
+- TOP / BOTTOM N and superlatives ("top 10", "largest", "highest", "most", "best",
+  "biggest", "smallest", "lowest", "worst"): you MUST set "sort" and "limit".
+  - "top 10 products by price": table/bar, x=product, y=price, agg=none,
+    sort={by:"value", dir:"desc"}, limit=10.
+  - "5 categories with the highest average price": bar, x=category, y=price, agg=avg,
+    sort={by:"value", dir:"desc"}, limit=5.
+  - "sort ... by value" means "by": "value" (the measure), NOT the x column.
+  Without sort, results come back in category order, which is WRONG for these.
+- RANK / "which has the most" is a top-1 or top-N: sort by value desc and limit.
 - Build a real dashboard: 2-4 widgets that answer the question from different angles,
   plus useful sharedFilters. Do not return a single chart unless the question truly
   asks for one number.`;

@@ -1,18 +1,22 @@
 import { AnthropicLLM, type LLMClient } from "@gendash/ai";
 
 /**
- * Real model when ANTHROPIC_API_KEY is set. Without a key we can't answer
- * free-form questions, so we decline gracefully through the out-of-scope path
- * (the UI shows it as a friendly notice) instead of erroring.
+ * Pick the model provider for one request.
+ *
+ * Priority: a key the visitor typed into the UI (passed here per-request,
+ * never stored on the server) wins, then the deployer's ANTHROPIC_API_KEY.
+ * With no key at all we decline gracefully through the out-of-scope path
+ * (the UI shows a friendly notice) instead of erroring.
  */
-export function getLLM(): LLMClient {
-  if (process.env.ANTHROPIC_API_KEY) return new AnthropicLLM();
+export function getLLM(userKey?: string): LLMClient {
+  const key = userKey?.trim() || process.env.ANTHROPIC_API_KEY;
+  if (key) return new AnthropicLLM({ apiKey: key });
   return {
     async json() {
       return {
         cannotAnswer: true,
         reason:
-          "This demo needs an AI key to answer questions. Add ANTHROPIC_API_KEY to enable free-form questions.",
+          "This demo needs an Anthropic API key to answer questions. Paste your own key above (it stays in your browser and is only used for your requests), or set ANTHROPIC_API_KEY on the server.",
       };
     },
   };

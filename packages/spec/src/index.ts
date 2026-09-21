@@ -30,6 +30,21 @@ export type Filter = z.infer<typeof Filter>;
 export const Bucket = z.enum(["day", "month", "quarter", "year"]);
 export type Bucket = z.infer<typeof Bucket>;
 
+export const SortDir = z.enum(["asc", "desc"]);
+export type SortDir = z.infer<typeof SortDir>;
+
+/**
+ * How to order results before `limit` slices them.
+ *  - by "value": the measure — the aggregated `value` in grouped mode, or the
+ *    `y` column in raw-row mode. This is what "top/bottom N by <measure>" needs.
+ *  - by "x": the dimension/category column.
+ */
+export const Sort = z.object({
+  by: z.enum(["x", "value"]),
+  dir: SortDir,
+});
+export type Sort = z.infer<typeof Sort>;
+
 export const Query = z.object({
   table: z.string(),
   /** dimension / category column (x axis, group key, table column) */
@@ -41,6 +56,8 @@ export const Query = z.object({
   /** bucket a date x into periods (month/quarter/year); implies aggregation */
   bucket: Bucket.optional(),
   filters: z.array(Filter).default([]),
+  /** order results before limit — required for "top N" / "largest / best" */
+  sort: Sort.optional(),
   limit: z.number().int().positive().max(10000).default(1000),
 });
 export type Query = z.infer<typeof Query>;
