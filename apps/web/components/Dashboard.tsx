@@ -110,7 +110,7 @@ export function Dashboard() {
         placeholder={
           sourceId
             ? "Ask a question about your uploaded data…"
-            : "Ask about world countries — e.g. “population by region”, “largest countries by area”"
+            : "Ask about world countries — e.g. “total area by region”, “countries per subregion”, “landlocked countries by region”"
         }
       />
 

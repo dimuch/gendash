@@ -4,16 +4,17 @@ import type { Connector, Row, RunOptions } from "./types";
 import { MemoryConnector } from "./memory";
 
 /**
- * A free, no-auth live data source for the demo: the REST Countries API
- * (https://restcountries.com). One table `countries` with a row per country —
- * region/subregion/continent dimensions, population/area measures, and a couple
- * of booleans. Enough for genuinely varied questions with no setup or key.
+ * A free, no-auth live data source for the demo: the mledoze/countries dataset
+ * (a stable JSON hosted on GitHub — no API key, no rate limits, no deprecation
+ * surprises). One table `countries` with a row per country.
  *
- * Fetched once and cached; then it's just an in-memory connector, so all the
- * usual group/aggregate/filter/bucket logic works unchanged.
+ * Note: this dataset has no population field; the measures are `area`,
+ * `languages` (count), and `neighbors` (count of bordering countries). Asking
+ * for population triggers the out-of-scope decline, which is correct.
+ *
+ * Fetched once and cached, then it's just an in-memory connector.
  */
-const ENDPOINT =
-  "https://restcountries.com/v3.1/all?fields=name,region,subregion,continents,population,area,languages,landlocked,unMember";
+const ENDPOINT = "https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json";
 
 const SCHEMA: DataSourceSchema = [
   {
@@ -22,12 +23,12 @@ const SCHEMA: DataSourceSchema = [
       { name: "country", type: "string" },
       { name: "region", type: "string" },
       { name: "subregion", type: "string" },
-      { name: "continent", type: "string" },
-      { name: "population", type: "number" },
       { name: "area", type: "number" },
       { name: "languages", type: "number" },
+      { name: "neighbors", type: "number" },
       { name: "landlocked", type: "boolean" },
       { name: "un_member", type: "boolean" },
+      { name: "independent", type: "boolean" },
     ],
   },
 ];
@@ -39,18 +40,21 @@ export class CountriesConnector implements Connector {
     if (!this.inner) {
       this.inner = (async () => {
         const res = await fetch(ENDPOINT, { headers: { accept: "application/json" } });
-        if (!res.ok) throw new Error(`REST Countries API -> ${res.status}`);
-        const data = (await res.json()) as any[];
-        const rows: Row[] = data.map((c) => ({
-          country: c?.name?.common ?? "",
-          region: c?.region ?? "Other",
-          subregion: c?.subregion ?? "Other",
-          continent: Array.isArray(c?.continents) ? c.continents[0] ?? "Other" : "Other",
-          population: Number(c?.population ?? 0),
+        if (!res.ok) throw new Error(`countries dataset -> ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          throw new Error("countries dataset returned an unexpected shape (not an array)");
+        }
+        const rows: Row[] = data.map((c: any) => ({
+          country: c?.name?.common ?? c?.cca3 ?? "",
+          region: c?.region || "Other",
+          subregion: c?.subregion || "Other",
           area: Number(c?.area ?? 0),
           languages: c?.languages ? Object.keys(c.languages).length : 0,
+          neighbors: Array.isArray(c?.borders) ? c.borders.length : 0,
           landlocked: !!c?.landlocked,
           un_member: !!c?.unMember,
+          independent: !!c?.independent,
         }));
         return new MemoryConnector(SCHEMA, { countries: rows });
       })();
