@@ -1,6 +1,6 @@
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { connectorFromCsv, connectorFromCsvText, type Connector } from "@gendash/connectors";
+import { connectorFromCsv, connectorFromCsvText, DisqoverConnector, type Connector } from "@gendash/connectors";
 
 /**
  * Data sources for the app.
@@ -24,7 +24,19 @@ const sources = g.__gendashSources;
 
 let demo: Connector | null = null;
 function demoConnector(): Connector {
-  if (!demo) demo = connectorFromCsv(path.join(process.cwd(), "data", "studies.csv"), "studies");
+  if (!demo) {
+    if (process.env.DISQOVER_URL) {
+      // Live Disqover instance when configured (put creds in .env.local).
+      demo = new DisqoverConnector({
+        baseUrl: process.env.DISQOVER_URL,
+        token: process.env.DISQOVER_TOKEN,
+        cookie: process.env.DISQOVER_COOKIE,
+        version: process.env.DISQOVER_VERSION,
+      });
+    } else {
+      demo = connectorFromCsv(path.join(process.cwd(), "data", "studies.csv"), "studies");
+    }
+  }
   return demo;
 }
 

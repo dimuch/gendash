@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GenDash — the glue</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0a0f1a;color:#e6edf7;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 18px 64px}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .lead{color:#8899ad;font-size:.95rem;margin:0 0 22px;max-width:70ch}
+  .pill{display:inline-block;font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:#7cc0ff;
+    border:1px solid rgba(124,192,255,.35);border-radius:999px;padding:.25rem .6rem;margin-bottom:14px}
+  /* shared spec block */
+  .spec{background:#0f1826;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 18px;margin-bottom:8px}
+  .spec .cap{font-size:.8rem;color:#8899ad;margin-bottom:8px}
+  .spec pre{margin:0;font-size:.78rem;line-height:1.5;color:#bcd;overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .arrow{text-align:center;color:#8899ad;font-size:1.4rem;margin:6px 0 14px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:780px){.cols{grid-template-columns:1fr}}
+  .tag{font-size:.75rem;color:#8899ad;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+  .dot{width:8px;height:8px;border-radius:50%}
+
+  /* LEFT: GenDash renderer (dark) */
+  .gd{background:#0f1826;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
+  .gd .t{font-size:.85rem;color:#8899ad;margin-bottom:12px}
+  .gd .row{display:grid;grid-template-columns:96px 1fr 62px;align-items:center;gap:9px;margin:8px 0;font-size:.82rem}
+  .gd .lab{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gd .track{background:rgba(255,255,255,.05);border-radius:5px}
+  .gd .bar{height:15px;border-radius:5px;background:linear-gradient(90deg,#7cc0ff,#a98bff)}
+  .gd .val{color:#8899ad;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* RIGHT: Disqover-style component (light) */
+  .dq{background:#ffffff;border:1px solid #e3e8ee;border-radius:14px;padding:16px;color:#2b3440}
+  .dq .hd{display:flex;align-items:center;gap:8px;border-bottom:1px solid #eef1f5;padding-bottom:10px;margin-bottom:8px}
+  .dq .hd .ic{width:18px;height:18px;border-radius:4px;background:#00a3b4}
+  .dq .hd b{font-size:.9rem;font-weight:600}
+  .dq .hd .n{margin-left:auto;font-size:.75rem;color:#7a8794}
+  .dq .frow{display:grid;grid-template-columns:1fr 64px;align-items:center;gap:8px;padding:6px 2px;font-size:.83rem;border-bottom:1px solid #f4f6f9}
+  .dq .frow .lab{color:#28323d}
+  .dq .frow .val{text-align:right;color:#5a6673;font-variant-numeric:tabular-nums}
+  .dq .frow .mini{height:4px;border-radius:3px;background:#00a3b4;margin-top:4px}
+  .dq .box{border:1px solid #dfe4ea;border-radius:8px;padding:2px 10px}
+
+  .foot{margin-top:26px;color:#8899ad;font-size:.86rem;line-height:1.55;max-width:78ch}
+  .foot b{color:#e6edf7}
+  code{background:#131f31;padding:1px 5px;border-radius:5px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="pill">GenDash · the glue</span>
+  <h1>One spec. Two completely different UIs.</h1>
+  <p class="lead">The same output from your library — a validated dashboard spec plus its data, for "clinical studies by country" (live counts from your Disqover instance) — rendered by <b>your</b> renderer on the left and by a <b>Disqover-style</b> component on the right. Identical brain, swappable pixels.</p>
+
+  <div class="spec">
+    <div class="cap">▸ What your library produces (renderer-agnostic JSON — the contract):</div>
+<pre>{
+  "title": "Clinical studies by country",
+  "widgets": [
+    { "type": "bar", "title": "Studies by country",
+      "query": { "table": "clinical_study", "x": "site_location",
+                 "agg": "count", "filters": [], "limit": 12 } }
+  ],
+  "sharedFilters": ["phase", "status"]
+}
+     +  rows: [ { site_location: "United States", value: 113009 }, … ]   ← from @gendash/connectors (Disqover /facets)</pre>
+  </div>
+  <div class="arrow">↓ &nbsp; the same spec + rows drive both of these &nbsp; ↓</div>
+
+  <div class="cols">
+    <div>
+      <div class="tag"><span class="dot" style="background:#7cc0ff"></span> rendered by <code>@gendash/react</code> (your renderer)</div>
+      <div class="gd">
+        <div class="t">Studies by country</div>
+        <div id="gd"></div>
+      </div>
+    </div>
+    <div>
+      <div class="tag"><span class="dot" style="background:#00a3b4"></span> rendered by a Disqover-style component (adapter)</div>
+      <div class="dq">
+        <div class="hd"><span class="ic"></span><b>Site Location</b><span class="n">1.1M studies</span></div>
+        <div id="dq"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Both panels read the <b>same</b> <code>spec</code> and the <b>same</b> <code>rows</code> — nothing in the data changed, only the component that draws them. That's the whole point: your library is the <b>headless brain</b> (question → validated spec → data via the connector), and the host app supplies the <b>pixels</b>. For Disqover you'd keep their chart/table/facet components and write a small adapter that maps a spec widget to them — the ~40 lines below the surface here. Your library gives them the AI + safety + data layer they don't have; they keep the look they already do.</p>
+</div>
+
+<script>
+  // ONE source of truth — the spec + rows your library produced.
+  const spec = { title:"Clinical studies by country",
+    widgets:[{ type:"bar", title:"Studies by country",
+      query:{ table:"clinical_study", x:"site_location", agg:"count", filters:[], limit:12 } }] };
+  const rows = [
+    {site_location:"United States",value:113009},{site_location:"China",value:53766},
+    {site_location:"France",value:36403},{site_location:"Canada",value:31990},
+    {site_location:"United Kingdom",value:28366},{site_location:"Germany",value:21135},
+    {site_location:"Spain",value:17980},{site_location:"Italy",value:17635},
+    {site_location:"South Korea",value:17361},{site_location:"Egypt",value:16430},
+    {site_location:"Netherlands",value:14880},{site_location:"Belgium",value:11885}
+  ];
+  const xKey = spec.widgets[0].query.x;
+  const nf = n => n.toLocaleString();
+  const max = Math.max(...rows.map(r=>r.value));
+
+  // Renderer A — @gendash/react style (dark bars)
+  document.getElementById('gd').innerHTML = rows.map(r=>`
+    <div class="row">
+      <span class="lab" title="${r[xKey]}">${r[xKey]}</span>
+      <span class="track"><span class="bar" style="width:${Math.max(3,r.value/max*100)}%"></span></span>
+      <span class="val">${nf(r.value)}</span>
+    </div>`).join('');
+
+  // Renderer B — Disqover-style facet component (light list + mini bar), SAME data
+  document.getElementById('dq').innerHTML = rows.map(r=>`
+    <div class="frow">
+      <div><div class="lab">${r[xKey]}</div><div class="mini" style="width:${Math.max(4,r.value/max*100)}%"></div></div>
+      <span class="val box">${nf(r.value)}</span>
+    </div>`).join('');
+</script>
+</body>
+</html>
