@@ -30,7 +30,7 @@ export function UploadBar({
       <button className="chip" onClick={() => ref.current?.click()} disabled={busy}>
         {busy ? "Loading…" : "⬆ Connect a CSV"}
       </button>
-      <span className="src-info">{info ?? "using demo data — clinical studies"}</span>
+      <span className="src-info">{info ?? "using live demo data — world countries (REST Countries API)"}</span>
     </div>
   );
 }

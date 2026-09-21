@@ -9,7 +9,8 @@ export default function Home() {
       </header>
       <Dashboard />
       <footer className="foot">
-        Demo data source. Point <code>getConnector()</code> at a read-only Postgres to use your own.
+        Live demo data from the free <a href="https://restcountries.com" target="_blank" rel="noreferrer">REST Countries API</a>.
+        Upload a CSV above, or point <code>getConnector()</code> at Postgres or a Disqover instance to use your own.
       </footer>
     </main>
   );

@@ -1,10 +1,10 @@
-import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { connectorFromCsv, connectorFromCsvText, DisqoverConnector, type Connector } from "@gendash/connectors";
+import { connectorFromCsvText, CountriesConnector, DisqoverConnector, type Connector } from "@gendash/connectors";
 
 /**
  * Data sources for the app.
- *  - the demo dataset (clinical studies) is the default.
+ *  - default: a free, no-auth live API (REST Countries) so anyone can ask
+ *    varied questions immediately. Set DISQOVER_URL to use a Disqover instance.
  *  - uploaded CSVs are registered by id and selected per request via sourceId.
  *    We keep the raw CSV alongside the connector so a saved dashboard can be
  *    made self-contained.
@@ -34,7 +34,7 @@ function demoConnector(): Connector {
         version: process.env.DISQOVER_VERSION,
       });
     } else {
-      demo = connectorFromCsv(path.join(process.cwd(), "data", "studies.csv"), "studies");
+      demo = new CountriesConnector(); // free, no-auth live demo
     }
   }
   return demo;

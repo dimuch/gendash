@@ -104,7 +104,16 @@ export function Dashboard() {
   return (
     <div>
       <UploadBar onUpload={upload} info={info} />
-      <QuestionBar onAsk={ask} loading={loading} showExamples={!sourceId} />
+      <QuestionBar
+        onAsk={ask}
+        loading={loading}
+        placeholder={
+          sourceId
+            ? "Ask a question about your uploaded data…"
+            : "Ask about world countries — e.g. “population by region”, “largest countries by area”"
+        }
+      />
+
       {error && <div className="error">{error}</div>}
       {notice && <div className="notice">{notice}</div>}
       {spec && (
