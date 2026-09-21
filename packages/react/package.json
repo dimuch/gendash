@@ -10,7 +10,8 @@
     "./styles.css": "./src/styles.css"
   },
   "dependencies": {
-    "@gendash/spec": "0.1.0"
+    "@gendash/spec": "0.1.0",
+    "@gendash/adapter": "0.1.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
