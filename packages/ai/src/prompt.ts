@@ -26,6 +26,11 @@ supply) — do NOT invent or force a dashboard. Instead return exactly:
   {"cannotAnswer": true, "reason": "<one short sentence: what's missing, and an example of what this data CAN answer>"}
 Only build a dashboard when the schema genuinely supports the question.
 
+TREND / OVER TIME: a "trend", "over time", "history", or "evolution" question
+needs a date or time-ordered column (e.g. a date, or a "year"/"month" column).
+If NO such column exists in the schema, do NOT plot a single snapshot as if it
+were a trend — return cannotAnswer and suggest a ranking or comparison instead.
+
 The JSON shape:
 {
   "title": string,

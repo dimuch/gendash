@@ -3,6 +3,7 @@ import type { DashboardSpec as Spec } from "@gendash/spec";
 import { DataSourceSchema } from "./dataschema";
 import { buildPrompt, errorTurn, ChatMessage } from "./prompt";
 import { checkAgainstSchema } from "./checkSchema";
+import { hasTimeAxis, isTrendQuestion } from "./timeAxis";
 import type { LLMClient } from "./llm";
 
 export class PlannerFailed extends Error {
@@ -33,6 +34,18 @@ export async function planDashboard(
   llm: LLMClient,
   opts: { maxAttempts?: number } = {}
 ): Promise<PlanResult> {
+  // Deterministic guard: a "trend over time" question against a source with no
+  // time axis (e.g. a live crypto snapshot) can't be answered honestly. Decline
+  // up front rather than let the model stretch a snapshot into a fake trend.
+  if (isTrendQuestion(question) && !hasTimeAxis(schema)) {
+    return {
+      spec: null,
+      cannotAnswer:
+        "This data is a single snapshot with no time column, so it can't show a trend over time. Try a ranking or comparison instead — e.g. \"top 10 by market cap\" or \"biggest 24h gainers\".",
+      attempts: 0,
+    };
+  }
+
   const maxAttempts = opts.maxAttempts ?? 3;
   const messages: ChatMessage[] = buildPrompt(question, schema);
   let lastProblems: string[] = [];
